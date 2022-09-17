@@ -63,8 +63,25 @@ function animate() {
         tile.update(mouse)
     })
 
-    buildings.forEach(b => {
-        b.draw()
+    buildings.forEach(building => {
+        building.update()
+        building.target = null
+        const validEnemies = enemies.filter(enemy => {
+            const distance = distanceOfTarget2(enemy, building)
+            return distance < enemy.radius + building.radius
+        })
+        building.target = validEnemies[0]
+
+
+        for (let i = building.projectiles.length - 1; i >= 0; i--) {
+            const projectile = building.projectiles[i];
+            projectile.update()
+
+            const distance = distanceOfTarget(projectile)
+            if (distance < projectile.enemy.radius + projectile.radius) {
+                building.projectiles.splice(i, 1)
+            }
+        }
     })
 }
 const mouse = {
@@ -81,7 +98,7 @@ canvas.addEventListener('click', (event) => {
                     y: activeTile.position.y
                 }
             }))
-            activeTile.isOccupied = true
+        activeTile.isOccupied = true
     }
     console.log(buildings)
 })
@@ -103,4 +120,20 @@ window.addEventListener('mousemove', (event) => {
         }
     }
 })
+
+function distanceOfTarget(proyectile) {
+    const xDifference = proyectile.enemy.center.x - proyectile.position.x
+    const yDifference = proyectile.enemy.center.y - proyectile.position.y
+
+    const distance = Math.hypot(xDifference, yDifference)
+    return distance
+}
+function distanceOfTarget2(enemy, building) {
+    const xDifference = enemy.center.x - building.center.x
+    const yDifference = enemy.center.y - building.center.y
+
+    const distance = Math.hypot(xDifference, yDifference)
+    return distance
+}
+
 
