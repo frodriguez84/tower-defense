@@ -53,11 +53,12 @@ let activeTile = undefined
 
 function animate() {
     requestAnimationFrame(animate)
-
     c.drawImage(image, 0, 0)
-    enemies.forEach(enemy => {
+
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i]
         enemy.update()
-    })
+    }
 
     placementTiles.forEach((tile) => {
         tile.update(mouse)
@@ -78,7 +79,13 @@ function animate() {
             projectile.update()
 
             const distance = distanceOfTarget(projectile)
+
+            //Projectile hits an enemy
             if (distance < projectile.enemy.radius + projectile.radius) {
+                projectile.enemy.health -= 20
+                if (projectile.enemy.health <= 0) {
+                    killEnemy(projectile)
+                }
                 building.projectiles.splice(i, 1)
             }
         }
@@ -121,6 +128,12 @@ window.addEventListener('mousemove', (event) => {
     }
 })
 
+function killEnemy(projectile) {
+    const enemyIndex = enemies.findIndex((enemy) => {
+        return projectile.enemy === enemy
+    })
+    if (enemyIndex > -1) enemies.splice(enemyIndex, 1)
+}
 function distanceOfTarget(proyectile) {
     const xDifference = proyectile.enemy.center.x - proyectile.position.x
     const yDifference = proyectile.enemy.center.y - proyectile.position.y
