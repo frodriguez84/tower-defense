@@ -43,15 +43,15 @@ image.src = 'img/gameMap.png'
 const enemies = []
 
 function spawnEnemies(spawnCount, speed) {
-    
+
     for (let i = 1; i < spawnCount; i++) {
         const xOffset = i * 150
-        
+
         enemies.push(new Enemy({
             position: { x: waypoints[0].x - xOffset, y: waypoints[0].y }
         }))
     }
-    
+
 }
 
 
@@ -60,6 +60,7 @@ let activeTile = undefined
 let enemyCount = 4
 let hearts = 10
 let coins = 100
+const explosions = []
 
 spawnEnemies(enemyCount)
 
@@ -80,9 +81,18 @@ function animate() {
                 cancelAnimationFrame(animationId)
                 document.querySelector('#gameOver').style.display = 'flex'
             }
-
         }
     }
+    for (let i = explosions.length - 1; i >= 0; i--) {
+        const explosion = explosions[i]
+        explosion.draw()
+        explosion.update()
+
+        if(explosion.frames.current >= explosion.frames.max - 1){
+            explosions.splice(i, 1)
+        }
+    }
+
     //Traking total amount of enemies
     if (enemies.length === 0) {
         enemyCount += 2
@@ -116,6 +126,14 @@ function animate() {
                     //Kills enemies
                     killEnemy(projectile)
                 }
+                explosions.push(
+                    new Sprite({
+                        position: { x: projectile.position.x, y: projectile.position.y },
+                        imgSrc: './img/explosion.png',
+                        frames: { max: 4 },
+                        offset: { x: 0, y: 0 }
+                    })
+                )
                 building.projectiles.splice(i, 1)
             }
         }
@@ -138,6 +156,9 @@ canvas.addEventListener('click', (event) => {
                 }
             }))
         activeTile.isOccupied = true
+        buildings.sort((a, b) => {
+            return a.position.y - b.position.y
+        })
     }
     console.log("No coins enoght")
 })
