@@ -42,20 +42,24 @@ image.src = 'img/gameMap.png'
 
 const enemies = []
 
-function spawnEnemies(spawnCount) {
+function spawnEnemies(spawnCount, speed) {
+    
     for (let i = 1; i < spawnCount; i++) {
         const xOffset = i * 150
+        
         enemies.push(new Enemy({
             position: { x: waypoints[0].x - xOffset, y: waypoints[0].y }
         }))
     }
+    
 }
 
 
 const buildings = []
 let activeTile = undefined
 let enemyCount = 4
-let hearts = 1
+let hearts = 10
+let coins = 100
 
 spawnEnemies(enemyCount)
 
@@ -70,7 +74,7 @@ function animate() {
         if (enemy.position.x > canvas.width) {
             hearts -= 1
             enemies.splice(i, 1)
-            console.log(hearts)
+            document.querySelector('#hearts').innerHTML = hearts
             if (hearts === 0) {
                 console.log('Game Over!')
                 cancelAnimationFrame(animationId)
@@ -123,7 +127,9 @@ const mouse = {
 }
 
 canvas.addEventListener('click', (event) => {
-    if (activeTile && !activeTile.isOccupied) {
+    if (activeTile && !activeTile.isOccupied && coins - 50 >= 0) {
+        coins -= 50
+        document.querySelector('#coins').innerHTML = coins
         buildings.push
             (new Building({
                 position: {
@@ -133,7 +139,7 @@ canvas.addEventListener('click', (event) => {
             }))
         activeTile.isOccupied = true
     }
-    console.log(buildings)
+    console.log("No coins enoght")
 })
 
 window.addEventListener('mousemove', (event) => {
@@ -158,7 +164,11 @@ function killEnemy(projectile) {
     const enemyIndex = enemies.findIndex((enemy) => {
         return projectile.enemy === enemy
     })
-    if (enemyIndex > -1) enemies.splice(enemyIndex, 1)
+    if (enemyIndex > -1) {
+        enemies.splice(enemyIndex, 1)
+        coins += 25
+        document.querySelector('#coins').innerHTML = coins
+    }
 }
 function distanceOfTarget(proyectile) {
     const xDifference = proyectile.enemy.center.x - proyectile.position.x

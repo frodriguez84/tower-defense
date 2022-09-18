@@ -14,7 +14,7 @@ class Enemy {
             x: 0,
             y: 0
         }
-        this.speed = 10
+        this.speed = 2
     }
     draw() {
         c.fillStyle = 'red'
